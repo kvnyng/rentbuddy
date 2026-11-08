@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/rentbuddy-mascot.png" alt="RentBuddy mascot: a smiling blue house giving a thumbs up" width="220">
+  <img src="packages/ui/src/assets/mascot.png" alt="RentBuddy mascot: a smiling blue house giving a thumbs up" width="220">
 </p>
 
 <h1 align="center">RentBuddy</h1>
