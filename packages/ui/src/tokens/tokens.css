@@ -74,9 +74,9 @@
   --rb-stage-applied-bg: var(--rb-color-green-100);
   --rb-stage-applied-fg: var(--rb-color-green-900);
   --rb-stage-applied-accent: var(--rb-color-green-500);
-  --rb-stage-signed-bg: var(--rb-color-green-500);
-  --rb-stage-signed-fg: var(--rb-color-ink-900);
-  --rb-stage-signed-accent: var(--rb-color-green-700);
+  --rb-stage-signed-bg: var(--rb-color-green-700);
+  --rb-stage-signed-fg: var(--rb-color-white);
+  --rb-stage-signed-accent: var(--rb-color-green-500);
   --rb-stage-passed-bg: var(--rb-color-coral-50);
   --rb-stage-passed-fg: var(--rb-color-coral-700);
   --rb-stage-passed-accent: var(--rb-color-coral-500);

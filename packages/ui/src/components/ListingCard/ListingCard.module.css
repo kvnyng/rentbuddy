@@ -52,13 +52,12 @@
 }
 
 .body { display: grid; gap: 2px; padding: var(--rb-space-3); }
-.row { display: flex; align-items: center; justify-content: space-between; gap: var(--rb-space-2); margin-bottom: var(--rb-space-1); }
-.price { font-family: var(--rb-font-heading); font-weight: var(--rb-weight-extrabold); font-size: var(--rb-size-lg); color: var(--rb-semantic-text); }
+.row { display: flex; align-items: center; justify-content: space-between; gap: var(--rb-space-2); margin-top: var(--rb-space-2); }
+.price { font-size: var(--rb-size-md); color: var(--rb-semantic-text); }
 .per { font-family: var(--rb-font-body); font-weight: var(--rb-weight-medium); font-size: var(--rb-size-sm); color: var(--rb-semantic-text-subtle); }
-.address { font-weight: var(--rb-weight-medium); color: var(--rb-semantic-text); }
+.address { font-weight: var(--rb-weight-bold); color: var(--rb-semantic-text); }
+.neighborhood { font-size: var(--rb-size-sm); font-weight: var(--rb-weight-bold); color: var(--rb-semantic-text-muted); }
 .meta { font-size: var(--rb-size-sm); color: var(--rb-semantic-text-muted); }
-.agent { margin-top: var(--rb-space-2); padding-top: var(--rb-space-2); border-top: 1px solid var(--rb-semantic-divider); font-size: var(--rb-size-sm); color: var(--rb-semantic-text); }
-.company { color: var(--rb-semantic-text-subtle); }
 .viewing {
   margin-top: var(--rb-space-2);
   padding: var(--rb-space-1) var(--rb-space-2);

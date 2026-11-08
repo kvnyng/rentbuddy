@@ -18,7 +18,7 @@ export type ListingCardProps = {
 };
 
 export function ListingCard({ listing, thumbnail, stage, nextViewing, unreadCount, onOpen }: ListingCardProps) {
-  const { address, agent } = listing;
+  const { address } = listing;
   const streetAndUnit = `${address.street}${address.unit === null ? "" : ` #${address.unit}`}`;
   return (
     <article className={styles.card} {...(onOpen === undefined ? {} : buttonProps(onOpen, `Open listing at ${streetAndUnit}`))}>
@@ -31,6 +31,8 @@ export function ListingCard({ listing, thumbnail, stage, nextViewing, unreadCoun
         )}
       </div>
       <div className={styles.body}>
+        <div className={styles.address}>{streetAndUnit}</div>
+        {address.neighborhood !== null && <div className={styles.neighborhood}>{address.neighborhood}</div>}
         <div className={styles.row}>
           <span className={styles.price}>
             {formatRent(listing.rent)}
@@ -38,17 +40,9 @@ export function ListingCard({ listing, thumbnail, stage, nextViewing, unreadCoun
           </span>
           <StageBadge stage={stage} />
         </div>
-        <div className={styles.address}>{streetAndUnit}</div>
-        {address.neighborhood !== null && <div className={styles.meta}>{address.neighborhood}</div>}
         <div className={styles.meta}>
           {[formatBedrooms(listing.bedrooms), formatBathrooms(listing.bathrooms), ...(listing.size === null ? [] : [formatSize(listing.size)])].join(" · ")}
         </div>
-        {agent !== null && (
-          <div className={styles.agent}>
-            {agent.name}
-            {agent.company !== null && <span className={styles.company}> · {agent.company}</span>}
-          </div>
-        )}
         {nextViewing !== null && <div className={styles.viewing}>Viewing: {formatSlot(nextViewing, listing.timeZone)}</div>}
       </div>
     </article>
