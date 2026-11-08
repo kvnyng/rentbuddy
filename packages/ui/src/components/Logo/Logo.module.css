@@ -1,0 +1,20 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--logo-size) * 0.2);
+}
+.mark {
+  height: var(--logo-size);
+  width: auto;
+}
+.wordmark {
+  font-family: var(--rb-font-heading);
+  font-weight: var(--rb-weight-extrabold);
+  font-size: calc(var(--logo-size) * 0.55);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--rb-semantic-text);
+}
+.accent {
+  color: var(--rb-semantic-primary-text);
+}

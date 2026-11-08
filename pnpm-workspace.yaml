@@ -1,0 +1,9 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Dependencies allowed to run install scripts. Ladle needs esbuild and SWC.
+allowBuilds:
+  esbuild: true
+  "@swc/core": true
+  msw: false

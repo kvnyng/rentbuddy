@@ -1,0 +1,64 @@
+.card {
+  width: 100%;
+  max-width: 300px;
+  background: var(--rb-semantic-surface);
+  border: 1px solid var(--rb-semantic-border);
+  border-radius: var(--rb-radius-lg);
+  box-shadow: var(--rb-shadow-sm);
+  overflow: hidden;
+  font-family: var(--rb-font-body);
+  transition: box-shadow 120ms ease, transform 120ms ease;
+}
+.card[tabindex]:hover { box-shadow: var(--rb-shadow-md); transform: translateY(-1px); cursor: pointer; }
+
+.photo {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: linear-gradient(135deg, var(--rb-color-cyan-100), var(--rb-color-green-100));
+  background-size: cover;
+  background-position: center;
+}
+.source {
+  position: absolute;
+  left: var(--rb-space-2);
+  top: var(--rb-space-2);
+  padding: 2px var(--rb-space-2);
+  border-radius: var(--rb-radius-sm);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--rb-semantic-text);
+  font-size: var(--rb-size-xs);
+  font-weight: var(--rb-weight-bold);
+}
+.unread {
+  position: absolute;
+  right: var(--rb-space-2);
+  top: var(--rb-space-2);
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: var(--rb-radius-pill);
+  background: var(--rb-semantic-danger);
+  color: var(--rb-color-ink-900);
+  font-size: var(--rb-size-xs);
+  font-weight: var(--rb-weight-bold);
+  display: grid;
+  place-items: center;
+}
+
+.body { display: grid; gap: 2px; padding: var(--rb-space-3) var(--rb-space-4) var(--rb-space-4); }
+.row { display: flex; align-items: center; justify-content: space-between; gap: var(--rb-space-2); margin-bottom: var(--rb-space-1); }
+.price { font-family: var(--rb-font-heading); font-weight: var(--rb-weight-extrabold); font-size: var(--rb-size-xl); color: var(--rb-semantic-text); }
+.per { font-family: var(--rb-font-body); font-weight: var(--rb-weight-medium); font-size: var(--rb-size-sm); color: var(--rb-semantic-text-subtle); }
+.address { font-weight: var(--rb-weight-bold); color: var(--rb-semantic-text); }
+.meta { font-size: var(--rb-size-sm); color: var(--rb-semantic-text-muted); }
+.agent { margin-top: var(--rb-space-2); font-size: var(--rb-size-sm); color: var(--rb-semantic-text); }
+.company { color: var(--rb-semantic-text-subtle); }
+.viewing {
+  margin-top: var(--rb-space-2);
+  padding: var(--rb-space-1) var(--rb-space-2);
+  border-radius: var(--rb-radius-sm);
+  background: var(--rb-color-yellow-50);
+  color: var(--rb-color-yellow-900);
+  font-size: var(--rb-size-sm);
+  font-weight: var(--rb-weight-medium);
+}

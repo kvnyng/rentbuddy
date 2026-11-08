@@ -1,0 +1,10 @@
+{
+  "name": "rentbuddy",
+  "private": true,
+  "packageManager": "pnpm@11.5.1",
+  "scripts": {
+    "ladle": "pnpm --filter @rentbuddy/ui ladle",
+    "ladle:build": "pnpm --filter @rentbuddy/ui ladle:build",
+    "typecheck": "pnpm -r typecheck"
+  }
+}

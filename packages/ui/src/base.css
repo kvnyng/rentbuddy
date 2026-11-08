@@ -1,0 +1,18 @@
+@import "./tokens/tokens.css";
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--rb-semantic-background);
+  color: var(--rb-semantic-text);
+  font-family: var(--rb-font-body);
+  font-size: var(--rb-size-md);
+  line-height: var(--rb-leading-normal);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--rb-semantic-focus-ring);
+  outline-offset: 2px;
+}

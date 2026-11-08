@@ -1,0 +1,32 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rb-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--rb-radius-pill);
+  font-family: var(--rb-font-body);
+  font-weight: var(--rb-weight-bold);
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+}
+.button:active:not(:disabled) { transform: translateY(1px); }
+.button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.sm { padding: var(--rb-space-2) var(--rb-space-3); font-size: var(--rb-size-sm); }
+.md { padding: var(--rb-space-3) var(--rb-space-4); font-size: var(--rb-size-md); }
+.lg { padding: var(--rb-space-4) var(--rb-space-5); font-size: var(--rb-size-lg); }
+
+/* Brand fills always carry dark ink text: white text fails contrast on every brand color. */
+.primary { background: var(--rb-semantic-primary); color: var(--rb-semantic-on-primary); box-shadow: var(--rb-shadow-clay); }
+.primary:hover:not(:disabled) { background: var(--rb-semantic-primary-hover); }
+
+.secondary { background: var(--rb-semantic-surface); color: var(--rb-semantic-text); border-color: var(--rb-semantic-border); }
+.secondary:hover:not(:disabled) { background: var(--rb-semantic-surface-sunken); }
+
+.ghost { background: transparent; color: var(--rb-semantic-primary-text); }
+.ghost:hover:not(:disabled) { background: var(--rb-color-cyan-50); }
+
+.danger { background: var(--rb-semantic-danger); color: var(--rb-color-ink-900); box-shadow: var(--rb-shadow-clay); }
+.danger:hover:not(:disabled) { background: var(--rb-color-coral-200); }
