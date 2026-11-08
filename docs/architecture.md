@@ -4,7 +4,9 @@ This document describes how RentBuddy is put together: the systems, the code lay
 
 **Principles:** [parse, don't validate](principles.md) — read it first.
 
-**Stack:** TypeScript everywhere · pnpm + Turborepo · Vite + React · TanStack Router + Query · Hono on Vercel Functions · Clerk · Postmark · Neon Postgres + Drizzle · Inngest · Vercel Blob · Claude API · WXT (Chrome MV3)
+**Stack:** TypeScript everywhere · pnpm + Turborepo · Vite + React · TanStack Router + Query · Hono on Cloudflare Workers · Cloudflare Workflows, Queues, R2, Hyperdrive · Clerk · Postmark · Neon Postgres + Drizzle · Claude API · WXT (Chrome MV3)
+
+**Production:** `https://rentbuddy.pablos.cc` (DNS on Cloudflare). Invite-only alpha.
 
 ---
 
@@ -17,10 +19,11 @@ flowchart LR
     WEB["Web app<br/>(Vite + React SPA)"]
   end
 
-  subgraph Vercel
-    API["API<br/>(Hono on Vercel Functions)"]
-    JOBS["Background jobs<br/>(Inngest functions)"]
-    BLOB[("Vercel Blob<br/>page snapshots, raw emails,<br/>thumbnails")]
+  subgraph Cloudflare["Cloudflare (rentbuddy.pablos.cc)"]
+    API["Worker<br/>SPA assets + Hono API"]
+    JOBS["Workflows + Queues<br/>(durable background jobs)"]
+    BLOB[("R2<br/>page snapshots, raw emails,<br/>thumbnails")]
+    HD["Hyperdrive<br/>(Postgres connection pool)"]
   end
 
   DB[("Neon Postgres")]
@@ -34,10 +37,11 @@ flowchart LR
   WEB -- "REST + typed client" --> API
   EXT & WEB -. sign in .-> CLERK
   CLERK -- "user.created webhook" --> API
-  API --> DB
+  API --> HD
+  HD --> DB
   API --> BLOB
   API -- "enqueue events" --> JOBS
-  JOBS --> DB
+  JOBS --> HD
   JOBS --> BLOB
   JOBS --> LLM
   API -- "send email" --> PM
@@ -49,8 +53,8 @@ flowchart LR
 
 **Principles**
 
-1. **The web request path stays fast and thin.** Webhooks and user actions validate, write the minimum, enqueue a job and return. Anything slow or flaky (LLM calls, image fetching, email matching) runs in Inngest, where every step is retried and idempotent.
-2. **Keep the raw input.** Every captured page and every inbound email is stored unmodified in Blob before it is parsed. When a parser improves, we re-run it over stored data rather than asking users to redo anything.
+1. **The web request path stays fast and thin.** Webhooks and user actions validate, write the minimum, enqueue a job and return. Anything slow or flaky (LLM calls, image fetching, email matching) runs in a Cloudflare Workflow, where every step is persisted, retried and idempotent.
+2. **Keep the raw input.** Every captured page and every inbound email is stored unmodified in R2 before it is parsed. When a parser improves, we re-run it over stored data rather than asking users to redo anything.
 3. **Domain logic is pure.** Parsing, matching rules, the stage state machine and metric calculations live in `packages/core`, which does no I/O. They're easy to unit test and are shared by the extension, the API and jobs.
 4. **Every query is scoped to a user.** Repository functions take `userId` as a required argument. There is no "get listing by id" without an owner.
 
@@ -65,16 +69,16 @@ apps/
       routes/               TanStack Router file routes
       features/             board/, listing/, inbox/, settings/ — components + query hooks per feature
       lib/                  api client, query client, clerk setup
-    api/
-      [[...route]].ts       Vercel entrypoint: two lines that hand every /api/* request to @rentbuddy/api
-  api/                      Hono backend (Vercel Functions in prod, Node in dev); exports `AppType`
+    worker/
+      index.ts              the Cloudflare Worker: /api/* → @rentbuddy/api, everything else → SPA assets
+    wrangler.jsonc          bindings: assets, R2, Hyperdrive, Queues, Workflows, cron, custom domain
+  api/                      Hono backend (runs inside the Worker); exports `AppType`
     src/
       app.ts                composes routes, exports the app and `type AppType`
       routes/               listings.ts, messages.ts, viewings.ts, calendar.ts, webhooks/
       services/             business logic: TrackService, MailService, ViewingService…
-      jobs/                 Inngest functions
+      jobs/                 Cloudflare Workflows and queue consumers
       middleware/           auth (Clerk JWT), error handling, request logging
-      dev.ts                local Node server
   extension/
     entrypoints/
       popup/                React popup: preview card + "Track in RentBuddy"
@@ -102,7 +106,7 @@ packages/
 ```mermaid
 flowchart TD
   web["apps/web"] --> ui & core
-  web -. "runtime: Vercel entrypoint<br/>types: AppType" .-> api
+  web -. "runtime: Worker entrypoint<br/>types: AppType" .-> api
   ext["apps/extension"] --> ui & core
   ext -. "types only: AppType" .-> api
   api["apps/api"] --> core & db
@@ -112,7 +116,7 @@ flowchart TD
 ```
 
 - `core` depends on nothing internal, and does no I/O.
-- The web SPA and the extension import **only the type** `AppType` from `apps/api` (`import type`), never its runtime code. The one exception is the two-line Vercel entrypoint in `apps/web/api/`.
+- The web SPA and the extension import **only the type** `AppType` from `apps/api` (`import type`), never its runtime code. The one exception is the Worker entrypoint in `apps/web/worker/`, which mounts the API.
 - Only `apps/api` imports `db`. Clients only talk to the API over HTTP.
 
 ### Server layering
@@ -127,13 +131,13 @@ Service           business logic; the only layer that enqueues jobs or calls Pos
 Repository (db)   Drizzle queries, always scoped by userId
 ```
 
-Inngest jobs call the same services as routes, so logic isn't duplicated between the request path and background work.
+Workflows call the same services as routes, so logic isn't duplicated between the request path and background work.
 
 ### Shared types and validation (zod)
 
 This repo follows [parse, don't validate](principles.md). There is one contract, written once as zod schemas in `packages/core/src`, and three things derived from it:
 
-1. **Parsing at every boundary.** The API parses request params, query and body (`@hono/zod-validator`) and parses its own responses before sending. Clients parse responses again on arrival, because the network is a boundary too. The extension parses pages into a `PageParseResult`. Inngest jobs parse event payloads. Postmark and Clerk webhook bodies are parsed before use. Database rows are parsed by `fromRow` functions.
+1. **Parsing at every boundary.** The API parses request params, query and body (`@hono/zod-validator`) and parses its own responses before sending. Clients parse responses again on arrival, because the network is a boundary too. The extension parses pages into a `PageParseResult`. Workflows and queue consumers parse their payloads. Postmark and Clerk webhook bodies are parsed before use. Database rows are parsed by `fromRow` functions.
 2. **Static types.** `type X = z.infer<typeof X>`. No hand-written duplicate interfaces. Branded types (`ListingId`, `Money`, `EmailAddress`…) can only be obtained by parsing.
 3. **End-to-end typed calls.** Hono infers each route's input type from its validators. The SPA and the extension use `hc<AppType>()` for typed requests, and parse responses with the matching core schema to turn wire types (ISO strings, plain numbers) back into domain types (`Date`, `Money`).
 
@@ -161,13 +165,12 @@ const tracked = TrackedListing.parse(await res.json()); // Date and Money again,
 
 | Process | Command | Port |
 |---|---|---|
-| Vite SPA | `vite` | 5173, proxies `/api` to 8787 |
-| Hono API | `tsx watch src/dev.ts` in `apps/api` (via `@hono/node-server`) | 8787 |
-| Inngest dev server | `inngest-cli dev` | 8288 |
+| SPA + Worker + API | `vite` with `@cloudflare/vite-plugin`: runs the real Worker in workerd, with local R2, Queues and Workflows | 5173 |
+| Postgres | local Postgres (Docker), wired to the Hyperdrive binding's `localConnectionString` | 5432 |
 | Extension | `wxt` (loads unpacked into Chrome with hot reload) | – |
 | Ladle | `ladle serve` | 61000 |
 
-`pnpm dev` starts all of them through Turborepo. Postmark inbound is tested locally by replaying saved webhook payloads (`pnpm --filter @rentbuddy/api replay-email fixtures/…`), so a tunnel isn't needed day to day.
+`pnpm dev` starts all of them through Turborepo. Because the dev server runs the same workerd runtime as production, Worker-only APIs behave the same locally. Postmark inbound is tested locally by replaying saved webhook payloads (`pnpm --filter @rentbuddy/api replay-email fixtures/…`), so a tunnel isn't needed day to day.
 
 ---
 
@@ -289,9 +292,9 @@ sequenceDiagram
   participant P as Popup
   participant BG as Extension background
   participant A as API
-  participant B as Blob
+  participant B as R2
   participant D as Postgres
-  participant J as Inngest
+  participant J as Workflow
 
   CS->>CS: detect listing page, parse with core parser<br/>(structured data first, DOM fallback)
   U->>P: open popup
@@ -301,12 +304,12 @@ sequenceDiagram
   P->>BG: track(parsed, html)
   BG->>A: POST /api/listings/track (Clerk token)
   A->>A: validate with zod
-  A->>B: put page snapshot
+  A->>B: put page snapshot (R2)
   A->>D: upsert LISTING, insert SNAPSHOT, TRACKED_LISTING (stage=tracked), EVENT
-  A->>J: send listing/tracked
+  A->>J: start TrackListing workflow
   A-->>BG: 201 trackedListing
   BG-->>P: success, link to card
-  J->>J: fetch photo, resize to thumbnail, store in Blob
+  J->>J: fetch photo, resize with Cloudflare Images, store thumbnail in R2
   J->>J: re-parse snapshot server-side if parserVersion is newer
   J->>D: attach any unmatched emails that mention this listing
 ```
@@ -351,16 +354,16 @@ sequenceDiagram
   participant X as Agent / Zillow
   participant PM as Postmark
   participant A as API
-  participant B as Blob
+  participant B as R2
   participant D as Postgres
-  participant J as Inngest
+  participant J as Workflow
   participant L as Claude
 
   X->>PM: email to kevin@mail.rentbuddy.app
   PM->>A: POST /api/webhooks/postmark (basic auth)
   A->>B: put raw JSON payload
   A->>D: insert INBOUND_EMAIL status=received<br/>(unique postmarkId, so retries are no-ops)
-  A->>J: send email/received
+  A->>J: start InboundEmail workflow
   A-->>PM: 200 (fast, so Postmark doesn't retry)
 
   J->>D: resolve inbox → user
@@ -373,7 +376,7 @@ sequenceDiagram
   J->>D: INBOUND_EMAIL status=matched
 ```
 
-- Each `step` is retried independently by Inngest, so a Claude timeout doesn't re-run matching.
+- Each workflow `step.do` is persisted and retried independently, so a Claude timeout doesn't re-run matching.
 - Matching that relies on Claude below a confidence threshold goes to **Unmatched** with a suggestion, rather than silently attaching to the wrong card.
 
 ### 5.5 Confirm a viewing and the calendar feed
@@ -429,10 +432,11 @@ All metrics are queries over `EVENT`, defined in `packages/core/metrics.ts`:
 | API auth | Clerk JWT verified in Hono middleware; `userId` comes from the token, never the request body |
 | Webhooks | Clerk: Svix signature check. Postmark: basic auth on the webhook URL plus payload validation |
 | Data isolation | repositories require `userId`; integration tests assert cross-user reads fail |
-| Duplicate deliveries | unique keys on `postmarkId`, `messageIdHeader`, `(source, sourceId)`; Inngest event ids |
+| Duplicate deliveries | unique keys on `postmarkId`, `messageIdHeader`, `(source, sourceId)`; workflow instance ids derived from the input |
 | Mail reputation | separate `mail.` subdomain, SPF/DKIM/DMARC, no unreviewed sends, outbound rate limit per user |
 | Parser breakage | parser tests on saved pages; `parserVersion` on every listing; nightly job re-parses snapshots after a parser release |
-| Secrets | Vercel environment variables only; nothing in the extension bundle except the Clerk publishable key and API URL |
+| Secrets | Worker secrets (`wrangler secret`), parsed with zod at startup; nothing in the extension bundle except the Clerk publishable key and API URL |
+| DNS | Clerk records under `clerk.rentbuddy.pablos.cc` (and Postmark under `mail.rentbuddy.pablos.cc` in M2) are DNS-only, not proxied, as both services require |
 
 ---
 

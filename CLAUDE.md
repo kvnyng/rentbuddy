@@ -1,6 +1,6 @@
 # RentBuddy
 
-TypeScript monorepo (pnpm + Turborepo): Vite + React, TanStack Router + Query, Hono on Vercel Functions, zod, Clerk, Postmark, Neon + Drizzle, Inngest, WXT extension.
+TypeScript monorepo (pnpm + Turborepo): Vite + React, TanStack Router + Query, Hono on Cloudflare Workers (Workflows, Queues, R2, Hyperdrive), zod, Clerk, Postmark, Neon + Drizzle, WXT extension. Production: https://rentbuddy.pablos.cc.
 
 - Architecture and execution flows: `docs/architecture.md`
 - **Engineering principles (mandatory): `docs/principles.md`.** In short: parse, don't validate; make invalid states unrepresentable; every state explicit and exhaustive; expected failures are `Result` values; one source of truth.
@@ -23,4 +23,4 @@ pnpm typecheck && pnpm lint && pnpm test
 pnpm ladle         # design system
 ```
 
-CI runs on Buildkite (org policy), not GitHub Actions.
+CI runs on GitHub Actions (personal repo; chosen over the org Buildkite default). Work lands through value-focused PRs; see `docs/roadmap.md`.
