@@ -1,0 +1,57 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "tokens": {
+      "inputs": [
+        "src/tokens/tokens.json",
+        "scripts/build-tokens.mjs"
+      ],
+      "outputs": [
+        "src/tokens/tokens.css"
+      ]
+    },
+    "build": {
+      "dependsOn": [
+        "^build",
+        "tokens"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
+    },
+    "ladle:build": {
+      "dependsOn": [
+        "tokens"
+      ],
+      "outputs": [
+        "build/**"
+      ]
+    },
+    "typecheck": {
+      "dependsOn": [
+        "^typecheck"
+      ]
+    },
+    "lint": {
+      "dependsOn": [
+        "^typecheck"
+      ]
+    },
+    "test": {},
+    "dev": {
+      "dependsOn": [
+        "tokens"
+      ],
+      "cache": false,
+      "persistent": true
+    },
+    "ladle": {
+      "dependsOn": [
+        "tokens"
+      ],
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

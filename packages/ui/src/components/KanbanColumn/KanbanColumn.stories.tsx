@@ -1,20 +1,22 @@
 import type { Story, StoryDefault } from "@ladle/react";
-import { STAGES } from "../../tokens/tokens";
-import { ListingCard } from "../ListingCard/ListingCard";
-import { sampleListings } from "../ListingCard/fixtures";
+import { STAGES } from "@rentbuddy/core";
+import { ListingCard, type ListingCardProps } from "../ListingCard/ListingCard";
+import { lowerEastSide, sampleCards } from "../ListingCard/fixtures";
 import { Logo } from "../Logo/Logo";
 import { Button } from "../Button/Button";
 import { KanbanColumn } from "./KanbanColumn";
 
 export default { title: "Components / Kanban" } satisfies StoryDefault;
 
+const keyOf = (c: ListingCardProps) => c.listing.address.street;
+
 export const Column: Story = () => (
-  <KanbanColumn stage="contacted" count={1}>
-    <ListingCard {...sampleListings[1]!} />
-  </KanbanColumn>
+  <KanbanColumn stage="contacted" items={[lowerEastSide]} getKey={keyOf} renderItem={(c) => <ListingCard {...c} />} />
 );
 
-export const EmptyColumn: Story = () => <KanbanColumn stage="applied" count={0} />;
+export const EmptyColumn: Story = () => (
+  <KanbanColumn stage="applied" items={[]} getKey={keyOf} renderItem={(c) => <ListingCard {...c} />} />
+);
 
 export const Board: Story = () => (
   <div style={{ display: "grid", gap: 24 }}>
@@ -23,14 +25,15 @@ export const Board: Story = () => (
       <Button>+ Track a listing</Button>
     </header>
     <div style={{ display: "flex", gap: 16, overflowX: "auto", paddingBottom: 8 }}>
-      {STAGES.map((stage) => {
-        const items = sampleListings.filter((l) => l.stage === stage);
-        return (
-          <KanbanColumn key={stage} stage={stage} count={items.length}>
-            {items.length ? items.map((l) => <ListingCard key={l.address} {...l} onClick={() => {}} />) : undefined}
-          </KanbanColumn>
-        );
-      })}
+      {STAGES.map((stage) => (
+        <KanbanColumn
+          key={stage}
+          stage={stage}
+          items={sampleCards.filter((c) => c.stage === stage)}
+          getKey={keyOf}
+          renderItem={(c) => <ListingCard {...c} onOpen={() => {}} />}
+        />
+      ))}
     </div>
   </div>
 );

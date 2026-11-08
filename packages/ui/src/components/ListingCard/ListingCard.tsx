@@ -1,54 +1,66 @@
-import type { Stage } from "../../tokens/tokens";
+import type { Listing, NonNegativeInt, ParsedListing, Stage, TimeSlot } from "@rentbuddy/core";
+import { formatBathrooms, formatBedrooms, formatRent, formatSize, formatSlot, SOURCE_LABELS } from "../../format";
 import { StageBadge } from "../StageBadge/StageBadge";
 import styles from "./ListingCard.module.css";
 
-export type ListingSource = "zillow" | "streeteasy";
+export type ListingCardListing = Pick<ParsedListing, "source" | "address" | "timeZone" | "rent" | "bedrooms" | "bathrooms" | "size" | "agent">;
 
 export type ListingCardProps = {
-  address: string;
-  neighborhood?: string;
-  price: number;
-  beds: number;
-  baths: number;
-  sqft?: number;
-  photoUrl?: string;
-  source: ListingSource;
+  listing: ListingCardListing;
+  thumbnail: Listing["thumbnail"];
   stage: Stage;
-  agentName?: string;
-  agentCompany?: string;
-  /** Pre-formatted, e.g. "Tue, Nov 11 · 6:30 PM" */
-  nextViewing?: string;
-  unreadCount?: number;
-  onClick?: () => void;
+  /** The confirmed viewing, if one is scheduled. */
+  nextViewing: TimeSlot | null;
+  unreadCount: NonNegativeInt;
+  onOpen?: () => void;
 };
 
-const SOURCE_LABEL: Record<ListingSource, string> = { zillow: "Zillow", streeteasy: "StreetEasy" };
-const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
-
-export function ListingCard(p: ListingCardProps) {
+export function ListingCard({ listing, thumbnail, stage, nextViewing, unreadCount, onOpen }: ListingCardProps) {
+  const { address, agent } = listing;
   return (
-    <article className={styles.card} onClick={p.onClick} tabIndex={p.onClick ? 0 : undefined}>
-      <div className={styles.photo} style={p.photoUrl ? { backgroundImage: `url(${p.photoUrl})` } : undefined}>
-        <span className={styles.source}>{SOURCE_LABEL[p.source]}</span>
-        {!!p.unreadCount && <span className={styles.unread} aria-label={`${p.unreadCount} unread`}>{p.unreadCount}</span>}
+    <article className={styles.card} onClick={onOpen} tabIndex={onOpen === undefined ? undefined : 0}>
+      <div className={styles.photo} style={thumbnailStyle(thumbnail)}>
+        <span className={styles.source}>{SOURCE_LABELS[listing.source]}</span>
+        {unreadCount > 0 && (
+          <span className={styles.unread} aria-label={`${unreadCount} unread`}>
+            {unreadCount}
+          </span>
+        )}
       </div>
       <div className={styles.body}>
         <div className={styles.row}>
-          <span className={styles.price}>{usd.format(p.price)}<span className={styles.per}>/mo</span></span>
-          <StageBadge stage={p.stage} />
+          <span className={styles.price}>
+            {formatRent(listing.rent)}
+            <span className={styles.per}>/mo</span>
+          </span>
+          <StageBadge stage={stage} />
         </div>
-        <div className={styles.address}>{p.address}</div>
-        {p.neighborhood && <div className={styles.meta}>{p.neighborhood}</div>}
+        <div className={styles.address}>
+          {address.street}
+          {address.unit === null ? "" : ` #${address.unit}`}
+        </div>
+        {address.neighborhood !== null && <div className={styles.meta}>{address.neighborhood}</div>}
         <div className={styles.meta}>
-          {p.beds === 0 ? "Studio" : `${p.beds} bd`} · {p.baths} ba{p.sqft ? ` · ${p.sqft.toLocaleString()} ft²` : ""}
+          {[formatBedrooms(listing.bedrooms), formatBathrooms(listing.bathrooms), ...(listing.size === null ? [] : [formatSize(listing.size)])].join(" · ")}
         </div>
-        {(p.agentName || p.agentCompany) && (
+        {agent !== null && (
           <div className={styles.agent}>
-            {p.agentName}{p.agentName && p.agentCompany ? " · " : ""}<span className={styles.company}>{p.agentCompany}</span>
+            {agent.name}
+            {agent.company !== null && <span className={styles.company}> · {agent.company}</span>}
           </div>
         )}
-        {p.nextViewing && <div className={styles.viewing}>Viewing: {p.nextViewing}</div>}
+        {nextViewing !== null && <div className={styles.viewing}>Viewing: {formatSlot(nextViewing, listing.timeZone)}</div>}
       </div>
     </article>
   );
+}
+
+function thumbnailStyle(thumbnail: Listing["thumbnail"]) {
+  switch (thumbnail.kind) {
+    case "ready":
+      return { backgroundImage: `url(${thumbnail.url})` };
+    case "pending":
+    case "unavailable":
+      return undefined; // gradient placeholder from CSS
+  }
 }

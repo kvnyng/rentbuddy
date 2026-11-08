@@ -1,4 +1,5 @@
 export * from "./tokens/tokens";
+export * from "./format";
 export * from "./components/Logo/Logo";
 export * from "./components/Typography/Typography";
 export * from "./components/Button/Button";

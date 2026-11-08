@@ -3,10 +3,13 @@ import styles from "./Typography.module.css";
 
 type Common = { children: ReactNode; className?: string };
 
-export type HeadingProps = Common & { level?: 1 | 2 | 3 | 4 };
+type HeadingLevel = 1 | 2 | 3 | 4;
+const HEADING_TAG = { 1: "h1", 2: "h2", 3: "h3", 4: "h4" } as const satisfies Record<HeadingLevel, ElementType>;
+
+export type HeadingProps = Common & { level?: HeadingLevel };
 /** Headers and titles — Sen. */
 export function Heading({ level = 2, children, className }: HeadingProps) {
-  const Tag = `h${level}` as ElementType;
+  const Tag = HEADING_TAG[level];
   return <Tag className={[styles.heading, styles[`h${level}`], className].filter(Boolean).join(" ")}>{children}</Tag>;
 }
 

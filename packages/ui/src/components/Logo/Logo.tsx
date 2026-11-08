@@ -9,14 +9,32 @@ export type LogoProps = {
 };
 
 export function Logo({ variant = "full", size = 48 }: LogoProps) {
-  return (
-    <span className={styles.logo} style={{ ["--logo-size" as string]: `${size}px` }}>
-      {variant !== "wordmark" && <img className={styles.mark} src={mascot} alt={variant === "mark" ? "RentBuddy" : ""} />}
-      {variant !== "mark" && (
-        <span className={styles.wordmark}>
-          Rent<span className={styles.accent}>Buddy</span>
+  const style = { "--logo-size": `${size}px` };
+  switch (variant) {
+    case "full":
+      return (
+        <span className={styles.logo} style={style}>
+          <img className={styles.mark} src={mascot} alt="" />
+          <Wordmark />
         </span>
-      )}
-    </span>
-  );
+      );
+    case "mark":
+      return (
+        <span className={styles.logo} style={style}>
+          <img className={styles.mark} src={mascot} alt="RentBuddy" />
+        </span>
+      );
+    case "wordmark":
+      return (
+        <span className={styles.logo} style={style}>
+          <Wordmark />
+        </span>
+      );
+  }
 }
+
+const Wordmark = () => (
+  <span className={styles.wordmark}>
+    Rent<span className={styles.accent}>Buddy</span>
+  </span>
+);

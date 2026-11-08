@@ -1,10 +1,12 @@
 import type { Story, StoryDefault } from "@ladle/react";
-import { tokens, STAGES, STAGE_LABELS } from "../tokens/tokens";
+import { STAGES, STAGE_LABELS } from "@rentbuddy/core";
+import { tokens } from "../tokens/tokens";
 import { Heading, Subtitle, Text } from "../components/Typography/Typography";
 
 export default { title: "Foundations / Colors" } satisfies StoryDefault;
 
-const ROLE: Record<string, string> = {
+type Scale = keyof typeof tokens.color & ("cyan" | "green" | "yellow" | "coral" | "ink");
+const ROLE: Record<Scale, string> = {
   cyan: "Primary brand · Contacted",
   green: "Success · Applied / Signed",
   yellow: "Attention · Viewing scheduled",
@@ -12,11 +14,13 @@ const ROLE: Record<string, string> = {
   ink: "Neutral text and UI",
 };
 
-const Swatch = ({ name, hex, cssVar, big }: { name: string; hex: string; cssVar: string; big?: boolean }) => (
+const SWATCH_HEIGHT = { large: 96, small: 56 } as const;
+
+const Swatch = ({ name, hex, cssVar, size = "small" }: { name: string; hex: string; cssVar: string; size?: keyof typeof SWATCH_HEIGHT }) => (
   <div style={{ display: "grid", gap: 6 }}>
     <div
       style={{
-        height: big ? 96 : 56,
+        height: SWATCH_HEIGHT[size],
         borderRadius: "var(--rb-radius-md)",
         background: `var(${cssVar})`,
         border: "1px solid rgba(14,26,43,0.08)",
@@ -37,7 +41,7 @@ export const Brand: Story = () => (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 16 }}>
       {(["cyan", "green", "yellow", "coral"] as const).map((c) => (
         <div key={c}>
-          <Swatch big name={c[0]!.toUpperCase() + c.slice(1)} hex={tokens.color[c]["500"]} cssVar={`--rb-color-${c}-500`} />
+          <Swatch size="large" name={c.charAt(0).toUpperCase() + c.slice(1)} hex={tokens.color[c]["500"]} cssVar={`--rb-color-${c}-500`} />
           <Text size="sm" tone="muted">{ROLE[c]}</Text>
         </div>
       ))}

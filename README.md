@@ -87,7 +87,9 @@ body       { font-family: "DM Sans", sans-serif; }
 
 ## Development
 
-This is a pnpm monorepo.
+A TypeScript monorepo using pnpm workspaces and [Turborepo](https://turborepo.com).
+
+**Stack:** Vite + React, TanStack Router, TanStack Query, Hono on Vercel Functions, Clerk, Postmark, Neon Postgres + Drizzle, WXT for the Chrome extension.
 
 ```
 packages/
@@ -97,7 +99,9 @@ apps/            web app and Chrome extension (coming next)
 
 ```bash
 pnpm install
+pnpm dev          # run every app in dev mode
 pnpm ladle        # browse the design system at http://localhost:61000
+pnpm build        # build everything (cached by Turborepo)
 pnpm typecheck
 ```
 

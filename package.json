@@ -3,8 +3,20 @@
   "private": true,
   "packageManager": "pnpm@11.5.1",
   "scripts": {
-    "ladle": "pnpm --filter @rentbuddy/ui ladle",
-    "ladle:build": "pnpm --filter @rentbuddy/ui ladle:build",
-    "typecheck": "pnpm -r typecheck"
-  }
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "ladle": "turbo run ladle --filter=@rentbuddy/ui",
+    "ladle:build": "turbo run ladle:build --filter=@rentbuddy/ui"
+  },
+  "devDependencies": {
+    "turbo": "^2.11.10",
+    "eslint": "^10.14.0",
+    "@eslint/js": "^10.0.1",
+    "typescript-eslint": "^8.72.1",
+    "typescript": "^5.9.3"
+  },
+  "type": "module"
 }
