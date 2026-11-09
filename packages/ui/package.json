@@ -8,7 +8,8 @@
     "./tokens": "./src/tokens/tokens.ts",
     "./tokens.css": "./src/tokens/tokens.css",
     "./fonts.css": "./src/fonts.css",
-    "./base.css": "./src/base.css"
+    "./base.css": "./src/base.css",
+    "./assets/*": "./src/assets/*"
   },
   "scripts": {
     "tokens": "node scripts/build-tokens.mjs",
