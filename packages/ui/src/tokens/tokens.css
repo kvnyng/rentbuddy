@@ -24,10 +24,13 @@
   --rb-color-coral-500: #FD6865;
   --rb-color-coral-700: #B85154;
   --rb-color-coral-900: #703A43;
+  --rb-color-ink-50: #F6F7F9;
   --rb-color-ink-100: #EEF1F5;
   --rb-color-ink-200: #D5DCE5;
   --rb-color-ink-300: #94A3B8;
+  --rb-color-ink-400: #7C8BA1;
   --rb-color-ink-500: #5B6B82;
+  --rb-color-ink-600: #475569;
   --rb-color-ink-700: #33415C;
   --rb-color-ink-900: #0E1A2B;
   --rb-color-paper: #FBFAF7;
@@ -35,7 +38,13 @@
   --rb-semantic-background: var(--rb-color-paper);
   --rb-semantic-surface: var(--rb-color-white);
   --rb-semantic-surface-sunken: var(--rb-color-ink-100);
+  --rb-semantic-surface-panel: var(--rb-color-ink-50);
   --rb-semantic-border: var(--rb-color-ink-200);
+  --rb-semantic-border-input: var(--rb-color-ink-400);
+  --rb-semantic-border-strong: var(--rb-color-ink-500);
+  --rb-semantic-divider: var(--rb-color-ink-200);
+  --rb-semantic-selected-bg: var(--rb-color-cyan-50);
+  --rb-semantic-selected-fg: var(--rb-color-cyan-900);
   --rb-semantic-text: var(--rb-color-ink-900);
   --rb-semantic-text-muted: var(--rb-color-ink-700);
   --rb-semantic-text-subtle: var(--rb-color-ink-500);
@@ -65,9 +74,9 @@
   --rb-stage-applied-bg: var(--rb-color-green-100);
   --rb-stage-applied-fg: var(--rb-color-green-900);
   --rb-stage-applied-accent: var(--rb-color-green-500);
-  --rb-stage-signed-bg: var(--rb-color-green-500);
-  --rb-stage-signed-fg: var(--rb-color-ink-900);
-  --rb-stage-signed-accent: var(--rb-color-green-700);
+  --rb-stage-signed-bg: var(--rb-color-green-700);
+  --rb-stage-signed-fg: var(--rb-color-white);
+  --rb-stage-signed-accent: var(--rb-color-green-500);
   --rb-stage-passed-bg: var(--rb-color-coral-50);
   --rb-stage-passed-fg: var(--rb-color-coral-700);
   --rb-stage-passed-accent: var(--rb-color-coral-500);
@@ -76,8 +85,8 @@
   --rb-font-body: "DM Sans Variable", "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --rb-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   --rb-size-xs: 0.75rem;
-  --rb-size-sm: 0.875rem;
-  --rb-size-md: 1rem;
+  --rb-size-sm: 0.8125rem;
+  --rb-size-md: 0.9375rem;
   --rb-size-lg: 1.125rem;
   --rb-size-xl: 1.375rem;
   --rb-size-2xl: 1.75rem;
@@ -99,12 +108,11 @@
   --rb-space-6: 2rem;
   --rb-space-7: 3rem;
   --rb-space-8: 4rem;
-  --rb-radius-sm: 6px;
-  --rb-radius-md: 10px;
+  --rb-radius-sm: 4px;
+  --rb-radius-md: 6px;
   --rb-radius-lg: 16px;
   --rb-radius-xl: 24px;
   --rb-radius-pill: 999px;
-  --rb-shadow-sm: 0 1px 2px rgba(14, 26, 43, 0.06), 0 1px 1px rgba(14, 26, 43, 0.04);
-  --rb-shadow-md: 0 4px 12px rgba(14, 26, 43, 0.08), 0 1px 3px rgba(14, 26, 43, 0.06);
-  --rb-shadow-clay: 0 10px 24px -8px rgba(14, 26, 43, 0.18), inset 0 -3px 0 rgba(14, 26, 43, 0.08);
+  --rb-shadow-sm: 0 1px 2px rgba(14, 26, 43, 0.05);
+  --rb-shadow-md: 0 2px 8px rgba(14, 26, 43, 0.08), 0 1px 2px rgba(14, 26, 43, 0.04);
 }

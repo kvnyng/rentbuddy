@@ -48,7 +48,8 @@ export const Brand: Story = () => (
     </div>
     <Text size="sm" tone="muted">
       Use dark ink text on brand fills. White text fails WCAG contrast on all four. For colored text on light
-      backgrounds, use the 700 shade (≥ 4.5:1 on paper).
+      backgrounds, use the 700 shade (≥ 4.5:1 on paper). The primary button is cyan 500 with ink text (9.9:1), and
+      cyan 200 on hover (13:1).
     </Text>
   </div>
 );
@@ -59,7 +60,7 @@ export const Scales: Story = () => (
       <div key={c}>
         <Heading level={4}>{c}</Heading>
         <Text size="sm" tone="subtle">{ROLE[c]}</Text>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, minmax(100px, 1fr))", gap: 12, marginTop: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))", gap: 12, marginTop: 12 }}>
           {Object.entries(tokens.color[c]).map(([step, hex]) => (
             <Swatch key={step} name={step} hex={hex} cssVar={`--rb-color-${c}-${step}`} />
           ))}
