@@ -1,4 +1,5 @@
 import type { Story, StoryDefault } from "@ladle/react";
+import { Plus } from "lucide-react";
 import { STAGES } from "@rentbuddy/core";
 import { ListingCard, type ListingCardProps } from "../ListingCard/ListingCard";
 import { lowerEastSide, sampleCards } from "../ListingCard/fixtures";
@@ -19,12 +20,12 @@ export const EmptyColumn: Story = () => (
 );
 
 export const Board: Story = () => (
-  <div style={{ display: "grid", gap: 24 }}>
+  <div style={{ display: "grid", gap: 16 }}>
     <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-      <Logo size={44} />
-      <Button>+ Track a listing</Button>
+      <Logo size={36} />
+      <Button leadingIcon={<Plus />}>Track a listing</Button>
     </header>
-    <div style={{ display: "flex", gap: 16, overflowX: "auto", paddingBottom: 8 }}>
+    <div style={{ display: "flex", gap: 12, overflowX: "auto", paddingBottom: 8 }}>
       {STAGES.map((stage) => (
         <KanbanColumn
           key={stage}

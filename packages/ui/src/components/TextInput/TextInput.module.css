@@ -1,0 +1,16 @@
+.input {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--rb-semantic-border-input);
+  border-radius: var(--rb-radius-sm);
+  background: var(--rb-semantic-surface);
+  color: var(--rb-semantic-text);
+  font: inherit;
+  font-size: var(--rb-size-md);
+  line-height: 1.4;
+}
+.input::placeholder { color: var(--rb-semantic-text-subtle); }
+.input:hover:not(:disabled) { border-color: var(--rb-semantic-border-strong); }
+.input:focus, .input:focus-within { outline: 2px solid var(--rb-semantic-focus-ring); outline-offset: 1px; border-color: var(--rb-semantic-focus-ring); }
+.input[aria-invalid="true"] { border-color: var(--rb-semantic-danger-text); }
+.input:disabled { background: var(--rb-semantic-surface-sunken); color: var(--rb-semantic-text-subtle); cursor: not-allowed; }

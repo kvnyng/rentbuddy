@@ -1,4 +1,5 @@
 import type { ElementType, ReactNode } from "react";
+import { classNames } from "../../classNames";
 import styles from "./Typography.module.css";
 
 type Common = { children: ReactNode; className?: string };
@@ -10,13 +11,13 @@ export type HeadingProps = Common & { level?: HeadingLevel };
 /** Headers and titles — Sen. */
 export function Heading({ level = 2, children, className }: HeadingProps) {
   const Tag = HEADING_TAG[level];
-  return <Tag className={[styles.heading, styles[`h${level}`], className].filter(Boolean).join(" ")}>{children}</Tag>;
+  return <Tag className={classNames(styles.heading, styles[`h${level}`], className)}>{children}</Tag>;
 }
 
 export type SubtitleProps = Common & { as?: ElementType };
 /** Subtitles — Sanchez. */
 export function Subtitle({ as: Tag = "p", children, className }: SubtitleProps) {
-  return <Tag className={[styles.subtitle, className].filter(Boolean).join(" ")}>{children}</Tag>;
+  return <Tag className={classNames(styles.subtitle, className)}>{children}</Tag>;
 }
 
 export type TextProps = Common & {
@@ -28,7 +29,7 @@ export type TextProps = Common & {
 /** Body copy — DM Sans. */
 export function Text({ as: Tag = "p", size = "md", tone = "default", weight = "regular", children, className }: TextProps) {
   return (
-    <Tag className={[styles.text, styles[`size-${size}`], styles[`tone-${tone}`], styles[`weight-${weight}`], className].filter(Boolean).join(" ")}>
+    <Tag className={classNames(styles.text, styles[`size-${size}`], styles[`tone-${tone}`], styles[`weight-${weight}`], className)}>
       {children}
     </Tag>
   );

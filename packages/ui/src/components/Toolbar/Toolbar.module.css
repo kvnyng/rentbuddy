@@ -1,0 +1,3 @@
+.toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: var(--rb-space-1); }
+.button { padding: 6px var(--rb-space-2); }
+.button[aria-pressed="true"] { background: var(--rb-semantic-selected-bg); color: var(--rb-semantic-selected-fg); }

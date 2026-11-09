@@ -7,9 +7,9 @@
   color: var(--rb-semantic-text);
 }
 .h1 { font-size: var(--rb-size-4xl); font-weight: var(--rb-weight-extrabold); letter-spacing: -0.02em; }
-.h2 { font-size: var(--rb-size-3xl); }
-.h3 { font-size: var(--rb-size-2xl); }
-.h4 { font-size: var(--rb-size-xl); }
+.h2 { font-size: var(--rb-size-2xl); }
+.h3 { font-size: var(--rb-size-xl); }
+.h4 { font-size: var(--rb-size-lg); }
 
 .subtitle {
   margin: 0;

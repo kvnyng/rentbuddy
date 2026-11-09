@@ -3,14 +3,14 @@
   max-width: 300px;
   background: var(--rb-semantic-surface);
   border: 1px solid var(--rb-semantic-border);
-  border-radius: var(--rb-radius-lg);
+  border-radius: var(--rb-radius-md);
   box-shadow: var(--rb-shadow-sm);
   overflow: hidden;
   font-family: var(--rb-font-body);
-  transition: box-shadow 120ms ease, transform 120ms ease;
+  transition: box-shadow 120ms ease, border-color 120ms ease;
 }
 .card[role="button"] { cursor: pointer; }
-.card[role="button"]:hover { box-shadow: var(--rb-shadow-md); transform: translateY(-1px); }
+.card[role="button"]:hover { box-shadow: var(--rb-shadow-md); border-color: var(--rb-semantic-border-input); }
 .card[role="button"]:focus-visible {
   outline: 2px solid var(--rb-semantic-focus-ring);
   outline-offset: 2px;
@@ -51,14 +51,13 @@
   place-items: center;
 }
 
-.body { display: grid; gap: 2px; padding: var(--rb-space-3) var(--rb-space-4) var(--rb-space-4); }
-.row { display: flex; align-items: center; justify-content: space-between; gap: var(--rb-space-2); margin-bottom: var(--rb-space-1); }
-.price { font-family: var(--rb-font-heading); font-weight: var(--rb-weight-extrabold); font-size: var(--rb-size-xl); color: var(--rb-semantic-text); }
+.body { display: grid; gap: 2px; padding: var(--rb-space-3); }
+.row { display: flex; align-items: center; justify-content: space-between; gap: var(--rb-space-2); margin-top: var(--rb-space-2); }
+.price { font-size: var(--rb-size-md); color: var(--rb-semantic-text); }
 .per { font-family: var(--rb-font-body); font-weight: var(--rb-weight-medium); font-size: var(--rb-size-sm); color: var(--rb-semantic-text-subtle); }
 .address { font-weight: var(--rb-weight-bold); color: var(--rb-semantic-text); }
+.neighborhood { font-size: var(--rb-size-sm); font-weight: var(--rb-weight-bold); color: var(--rb-semantic-text-muted); }
 .meta { font-size: var(--rb-size-sm); color: var(--rb-semantic-text-muted); }
-.agent { margin-top: var(--rb-space-2); font-size: var(--rb-size-sm); color: var(--rb-semantic-text); }
-.company { color: var(--rb-semantic-text-subtle); }
 .viewing {
   margin-top: var(--rb-space-2);
   padding: var(--rb-space-1) var(--rb-space-2);
