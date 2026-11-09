@@ -43,7 +43,7 @@
   height: 22px;
   padding: 0 6px;
   border-radius: var(--rb-radius-pill);
-  background: var(--rb-semantic-danger);
+  background: var(--rb-color-coral-200);
   color: var(--rb-color-ink-900);
   font-size: var(--rb-size-xs);
   font-weight: var(--rb-weight-bold);
