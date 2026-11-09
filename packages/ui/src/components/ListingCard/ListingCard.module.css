@@ -9,7 +9,13 @@
   font-family: var(--rb-font-body);
   transition: box-shadow 120ms ease, transform 120ms ease;
 }
-.card[tabindex]:hover { box-shadow: var(--rb-shadow-md); transform: translateY(-1px); cursor: pointer; }
+.card[role="button"] { cursor: pointer; }
+.card[role="button"]:hover { box-shadow: var(--rb-shadow-md); transform: translateY(-1px); }
+.card[role="button"]:focus-visible {
+  outline: 2px solid var(--rb-semantic-focus-ring);
+  outline-offset: 2px;
+  box-shadow: var(--rb-shadow-md);
+}
 
 .photo {
   position: relative;

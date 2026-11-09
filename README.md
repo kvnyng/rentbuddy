@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/rentbuddy-mascot.png" alt="RentBuddy mascot: a smiling blue house giving a thumbs up" width="220">
+  <img src="packages/ui/src/assets/mascot.png" alt="RentBuddy mascot: a smiling blue house giving a thumbs up" width="220">
 </p>
 
 <h1 align="center">RentBuddy</h1>
@@ -89,7 +89,7 @@ body       { font-family: "DM Sans", sans-serif; }
 
 A TypeScript monorepo using pnpm workspaces and [Turborepo](https://turborepo.com).
 
-**Stack:** Vite + React, TanStack Router, TanStack Query, Hono on Vercel Functions, Clerk, Postmark, Neon Postgres + Drizzle, WXT for the Chrome extension.
+**Stack:** Vite + React, TanStack Router, TanStack Query, Hono on Cloudflare Workers (Workflows, Queues, R2, Hyperdrive), Clerk, Postmark, Neon Postgres + Drizzle, WXT for the Chrome extension.
 
 ```
 packages/
