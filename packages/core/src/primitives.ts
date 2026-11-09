@@ -31,6 +31,18 @@ export const EmailAddress = z
   .brand<"EmailAddress">();
 export type EmailAddress = z.infer<typeof EmailAddress>;
 
+/**
+ * E.164 phone number, e.g. "+12125550123". Spaces, dashes, dots and parentheses
+ * are stripped first, so "+1 (212) 555-0123" parses to the same value.
+ * Clerk verifies the number itself; this only fixes the shape.
+ */
+export const PhoneNumber = z
+  .string()
+  .transform((s) => s.replace(/[\s().-]/g, ""))
+  .pipe(z.string().regex(/^\+[1-9]\d{1,14}$/, "E.164 phone number"))
+  .brand<"PhoneNumber">();
+export type PhoneNumber = z.infer<typeof PhoneNumber>;
+
 export const HttpsUrl = z.url({ protocol: /^https$/ }).brand<"HttpsUrl">();
 export type HttpsUrl = z.infer<typeof HttpsUrl>;
 

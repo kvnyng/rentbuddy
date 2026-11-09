@@ -5,3 +5,5 @@ export * from "./viewing";
 export * from "./stage";
 export * from "./inbound-email";
 export * from "./event";
+export * from "./me";
+export * from "./clerk";
