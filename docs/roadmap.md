@@ -36,11 +36,13 @@ Work lands as **value-focused PRs**: each one gives a renter something they can 
 | PR | A renter can… | Introduces | Size |
 |---|---|---|---|
 | **0** | *(enabler, no user value)* | GitHub Actions CI (typecheck, lint, test, Ladle build), PR template, `main` branch protection, fixes from the review (single mascot image, token build fails on unknown references, keyboard-accessible `ListingCard`), Cloudflare architecture, this roadmap | S |
+| **0.5** | *(enabler, done)* | Design-system restyle in `packages/ui`: brand-cyan primary `Button`, `Field`/`TextInput`, `Toolbar`/`ToolbarButton`, transparent mascot and icon exports | S |
 | **1** | **accept an invite, sign up with email + phone, and see their empty board at rentbuddy.pablos.cc** | `apps/web` (Vite + `@cloudflare/vite-plugin`, TanStack Router + Query, Clerk), `apps/api` (Hono, Clerk auth middleware, env parsed with zod), `PhoneNumber` in core, Worker with custom domain, deploy workflow (production on merge, preview URL per PR), Clerk production instance in invite-only mode | M |
 | **2** | **click "Track in RentBuddy" on a StreetEasy listing and see it on their board** | StreetEasy parser + saved-page tests; `packages/db` (Drizzle, `listing` and `tracked_listing` with CHECK constraints, migrations run by the deploy workflow, Hyperdrive); `POST /listings/track` with R2 snapshots; `apps/extension` (WXT, Clerk session sync); minimal privacy policy page (required to submit the extension). **Then submit an unlisted build to the Chrome Web Store.** | L, 5 commits |
 | **3** | **track Zillow listings too** | Zillow parser + tests, second content script | S |
 | **4** | **move cards between stages, pass with a reason, and restore** | `StageService.transition` (stage row and event written in one transaction), drag and drop with instant updates, pass/restore UI | M |
-| **5** | **see photos on cards and open a listing's detail page** | First Workflow (`TrackListing`), thumbnails via Cloudflare Images stored in R2, `/listing/$id` route with gallery | M |
+| **4.5** | **organise listings into their own lists and star the ones that matter** | User-created, renamable lists (many-to-many with tracked listings), a starred toggle (a union, not a bare boolean) with a 'starred' filter, the stage badge comes off the card (columns still show stage) | S–M |
+| **5** | **see photos on cards and open a listing's detail view** | First Workflow (`TrackListing`), thumbnails via Cloudflare Images stored in R2; `/listing/$id` rendered as an overlay over the board (linkable, Back closes it); tabbed detail with an Overview tab (gallery, overview) and a right sidebar; design-system `Tabs`, `DetailLayout`, `SidebarSection` | M (may split: thumbnails/Workflow, then detail view) |
 | **6** | **be guided from their invite to their first tracked listing** | Onboarding checklist (install the extension, track a first listing), extension install link, empty states | S |
 | **7** | **read how their data is used, and delete their account and data** | Full privacy policy and terms, account deletion across Clerk, Postgres and R2, Chrome Web Store privacy disclosures | S |
 | **8** | **report a problem, and we see errors before they report them** | Sentry (web, Worker, extension), Workers rate limiting, Neon point-in-time restore check, alerts, feedback link, production runbook | S |
@@ -51,6 +53,7 @@ Work lands as **value-focused PRs**: each one gives a renter something they can 
 |---|---|
 | PR 0 | Add a `CLOUDFLARE_API_TOKEN` repository secret (Workers deploy permission) for GitHub Actions |
 | PR 1 | Create a Clerk production instance for `rentbuddy.pablos.cc` and add its DNS records in Cloudflare (**DNS only, not proxied**). Turn on email + phone as required identifiers and set sign-up to restricted (invite-only). SMS verification needs a paid Clerk plan. |
+| PR 1 | Create a Clerk **development** instance for previews and local dev (same settings: email + phone required, restricted sign-up). Set `CLERK_SECRET_KEY` on both Workers (`wrangler secret put CLERK_SECRET_KEY` and `… --env preview`), and send the two publishable keys and the workers.dev subdomain to be committed in `wrangler.jsonc`. |
 | PR 2 | Create a Neon project (production branch) and a Hyperdrive config pointing at it. Register a Chrome Web Store developer account ($5). |
 | PR 8 | Create a Sentry project |
 | M2 | Postmark account + `mail.rentbuddy.pablos.cc` DNS records |
@@ -63,8 +66,8 @@ Work lands as **value-focused PRs**: each one gives a renter something they can 
 | PR | A renter can… | Introduces |
 |---|---|---|
 | **9** | **get their RentBuddy email address and see every email it receives** | Address provisioning, Postmark inbound webhook to the Worker, raw emails in R2, `InboundEmail` workflow, Inbox page, attach an email to a listing by hand. Onboarding gains "use your RentBuddy address on Zillow/StreetEasy". |
-| **10** | **have Zillow/StreetEasy and agent emails attach to the right listing automatically** | Site notification-email parsers, matching by known agent, thread view on the listing page |
-| **11** | **email agents and reply in a thread from RentBuddy** | Postmark outbound, reply threading headers, automatic move to Contacted, SPF/DKIM/DMARC, per-user send limit |
+| **10** | **have Zillow/StreetEasy and agent emails attach to the right listing automatically** | Site notification-email parsers, matching by known agent, thread view in the listing detail's new **Communications** tab |
+| **11** | **email agents and reply in a thread from RentBuddy** | Replies written and sent by the renter from the Communications tab (email only, no auto-send), Postmark outbound, reply threading headers, automatic move to Contacted, SPF/DKIM/DMARC, per-user send limit |
 
 ## Milestone 3: Assist
 
