@@ -1,0 +1,9 @@
+.page {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--rb-space-5);
+  padding: var(--rb-space-5);
+  background: var(--rb-semantic-surface-panel);
+}

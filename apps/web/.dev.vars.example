@@ -1,0 +1,10 @@
+# Local dev runs the "preview" environment (Clerk development instance), so the
+# publishable key comes from wrangler.jsonc. Copy to .dev.vars (gitignored) and
+# fill in the Clerk *development* secret key. Never commit .dev.vars.
+CLERK_SECRET_KEY=sk_test_...
+# Overrides the preview wildcard so tokens from the local dev server are accepted.
+APP_ORIGIN=http://localhost:61010
+# Optional, until the dev instance's publishable key is committed to wrangler.jsonc
+# (env.preview.vars): set it here for the Worker, and as VITE_CLERK_PUBLISHABLE_KEY
+# in .env.local for the SPA.
+# CLERK_PUBLISHABLE_KEY=pk_test_...

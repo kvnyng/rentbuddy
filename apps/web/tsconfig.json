@@ -1,0 +1,7 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["vite/client", "@cloudflare/workers-types"]
+  },
+  "include": ["src", "worker", "build", "../../packages/ui/src/react-css-vars.d.ts"]
+}
