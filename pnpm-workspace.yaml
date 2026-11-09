@@ -2,8 +2,11 @@ packages:
   - "apps/*"
   - "packages/*"
 
-# Dependencies allowed to run install scripts. Ladle needs esbuild and SWC.
+# Dependencies allowed to run install scripts. Ladle needs esbuild and SWC;
+# wrangler and @cloudflare/vite-plugin need workerd (the local Workers runtime).
 allowBuilds:
   esbuild: true
   "@swc/core": true
+  workerd: true
   msw: false
+

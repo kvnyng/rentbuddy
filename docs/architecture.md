@@ -66,16 +66,18 @@ flowchart LR
 apps/
   web/
     src/                    Vite + React SPA
-      routes/               TanStack Router file routes
+      routes/               TanStack Router file routes: sign-in.$ / sign-up.$ (Clerk), _authed (redirects signed-out visitors), _authed/index (board)
       features/             board/, listing/, inbox/, settings/ — components + query hooks per feature
-      lib/                  api client, query client, clerk setup
+      lib/                  api client (`hc<AppType>` + query options), Clerk session union and appearance
     worker/
       index.ts              the Cloudflare Worker: /api/* → @rentbuddy/api, everything else → SPA assets
-    wrangler.jsonc          bindings: assets, R2, Hyperdrive, Queues, Workflows, cron, custom domain
+    wrangler.jsonc          bindings: assets, R2, Hyperdrive, Queues, Workflows, cron, custom domain; env.preview = separate Worker
   api/                      Hono backend (runs inside the Worker); exports `AppType`
     src/
-      app.ts                composes routes, exports the app and `type AppType`
-      routes/               listings.ts, messages.ts, viewings.ts, calendar.ts, webhooks/
+      app.ts                `createApp(makeDeps)`: parses env, composes routes, exports `type AppType`
+      env.ts                bindings and secrets parsed with zod (`ApiEnv`)
+      clerk.ts              production deps: Clerk token verification and profiles (tests pass stubs)
+      routes/               me.ts (done); listings.ts, messages.ts, viewings.ts, calendar.ts, webhooks/ (next)
       services/             business logic: TrackService, MailService, ViewingService…
       jobs/                 Cloudflare Workflows and queue consumers
       middleware/           auth (Clerk JWT), error handling, request logging
@@ -165,12 +167,23 @@ const tracked = TrackedListing.parse(await res.json()); // Date and Money again,
 
 | Process | Command | Port |
 |---|---|---|
-| SPA + Worker + API | `vite` with `@cloudflare/vite-plugin`: runs the real Worker in workerd, with local R2, Queues and Workflows | 5173 |
+| SPA + Worker + API | `pnpm --filter @rentbuddy/web dev`: `vite` with `@cloudflare/vite-plugin` and `CLOUDFLARE_ENV=preview`, running the real Worker in workerd, with local R2, Queues and Workflows. Secrets come from `apps/web/.dev.vars` (see `.dev.vars.example`) | 61010 |
 | Postgres | local Postgres (Docker), wired to the Hyperdrive binding's `localConnectionString` | 5432 |
 | Extension | `wxt` (loads unpacked into Chrome with hot reload) | – |
 | Ladle | `ladle serve` | 61000 |
 
 `pnpm dev` starts all of them through Turborepo. Because the dev server runs the same workerd runtime as production, Worker-only APIs behave the same locally. Postmark inbound is tested locally by replaying saved webhook payloads (`pnpm --filter @rentbuddy/api replay-email fixtures/…`), so a tunnel isn't needed day to day.
+
+### Environments and deployment
+
+| Environment | Worker | URL | Clerk instance | Deployed by |
+|---|---|---|---|---|
+| Production | `rentbuddy` (top level of `wrangler.jsonc`) | `https://rentbuddy.pablos.cc` (custom domain; `workers_dev` and preview URLs off) | production | `deploy.yml` on push to `main` (`wrangler deploy`); fails if `CLOUDFLARE_API_TOKEN` is missing |
+| Preview | `rentbuddy-preview` (`env.preview`) | `https://pr-<n>-rentbuddy-preview.<subdomain>.workers.dev` | development | `deploy.yml` on each PR (`wrangler versions upload --preview-alias pr-<n>`), URL commented on the PR |
+
+Previews are a **separate Worker**, not versions of production: a version inherits its Worker's secrets, and production Clerk keys only work on `rentbuddy.pablos.cc`. With the Vite plugin, the environment is chosen at build time with `CLOUDFLARE_ENV`, and `wrangler` then deploys the built config (no `--env` flag). The first preview run creates `rentbuddy-preview` with `wrangler deploy` if it doesn't exist yet.
+
+Sign-up is **invite-only**: the Clerk instances use restricted sign-up mode, with email and phone as required, verified identifiers. Invitations are sent from the Clerk dashboard with the redirect URL `https://rentbuddy.pablos.cc/sign-up`; Clerk's `<SignUp>` picks up the `__clerk_ticket` parameter. Sign-up without a ticket is refused by Clerk, not by our code.
 
 ---
 
@@ -276,8 +289,8 @@ sequenceDiagram
   C->>A: webhook user.created (Svix-signed)
   A->>A: verify signature
   A->>D: insert USER, INBOX (address from name + suffix if taken), calendar_token
-  W->>A: GET /api/me
-  A-->>W: profile + inbox address
+  W->>A: GET /api/me (Clerk session token)
+  A-->>W: Me: userId, email, phone (+ inbox address from M2)
   W-->>U: Onboarding: "Use kevin@mail.rentbuddy.app on Zillow and StreetEasy"
 ```
 
@@ -429,13 +442,13 @@ All metrics are queries over `EVENT`, defined in `packages/core/metrics.ts`:
 
 | Concern | Approach |
 |---|---|
-| API auth | Clerk JWT verified in Hono middleware; `userId` comes from the token, never the request body |
+| API auth | Clerk session token verified in Hono middleware (`authorizedParties` = the app origin; previews allow `*-rentbuddy-preview.<subdomain>.workers.dev`); `userId` comes from the token, never the request body; missing/invalid token → 401 |
 | Webhooks | Clerk: Svix signature check. Postmark: basic auth on the webhook URL plus payload validation |
 | Data isolation | repositories require `userId`; integration tests assert cross-user reads fail |
 | Duplicate deliveries | unique keys on `postmarkId`, `messageIdHeader`, `(source, sourceId)`; workflow instance ids derived from the input |
 | Mail reputation | separate `mail.` subdomain, SPF/DKIM/DMARC, no unreviewed sends, outbound rate limit per user |
 | Parser breakage | parser tests on saved pages; `parserVersion` on every listing; nightly job re-parses snapshots after a parser release |
-| Secrets | Worker secrets (`wrangler secret`), parsed with zod at startup; nothing in the extension bundle except the Clerk publishable key and API URL |
+| Secrets | Worker secrets (`wrangler secret`), parsed with zod per isolate (`apps/api/src/env.ts`); public config (Clerk publishable key, app origin) lives in `wrangler.jsonc` vars, which the SPA build also reads; nothing in the extension bundle except the Clerk publishable key and API URL |
 | DNS | Clerk records under `clerk.rentbuddy.pablos.cc` (and Postmark under `mail.rentbuddy.pablos.cc` in M2) are DNS-only, not proxied, as both services require |
 
 ---

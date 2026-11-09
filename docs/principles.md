@@ -16,7 +16,7 @@ A **boundary** is anywhere data enters our TypeScript from somewhere the compile
 | HTTP responses, on the client | the same schema: `TrackedListing.parse(await res.json())` |
 | Webhooks (Postmark, Clerk) | core schemas, after signature/auth checks |
 | Database rows | `fromRow` functions in `packages/db` that return domain types |
-| Inngest event payloads | event schemas in core |
+| Cloudflare Workflow params and Queue messages | event schemas in core |
 | Listing pages (extension) | site parsers that return a `ParseResult` union |
 | LLM output | structured output, then a zod schema |
 | Environment variables | one `env.ts` per app, parsed at startup |
@@ -74,7 +74,7 @@ Functions that can fail in ways the caller should handle return `Result<T, E>` w
 function pass(state: StageState, reason: PassReason): Result<StageState, TransitionError>
 ```
 
-`throw` is for bugs and infrastructure failures (database down, invariant violated), which are caught by the request error handler or retried by Inngest. Treat any function returning `void` whose main job is to throw with suspicion: it's a validator, and should usually be a parser.
+`throw` is for bugs and infrastructure failures (database down, invariant violated), which are caught by the request error handler or retried by Cloudflare Workflows and Queues. Treat any function returning `void` whose main job is to throw with suspicion: it's a validator, and should usually be a parser.
 
 ## 5. One source of truth
 
